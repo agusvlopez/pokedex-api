@@ -99,17 +99,23 @@ resources/
 ## ⚡ Funcionalidad Adicional Implementada
 
 ### 1. **Caché Inteligente (Cache Layer)**
-   - **Implementación**: Sistema de caché con expiración de 1 hora
-   - **Ubicaciones**: 
-     - `getPokemons()`: Cachea listados paginados (esto, a su vez, utilizado en la búsqueda)
-     - `getPokemon()`: Cachea detalles individuales
-   - **Beneficio**: Reduce significativamente llamadas a la API externa, mejora velocidad de respuesta
+   - **Implementación**: Sistema de caché con expiración configurable
+   - **Estrategia de búsqueda**:
+     - `getPokemonIndex(500)`: Cachea un índice de los primeros 500 pokémon por 24h. Primera llamada descarga de API, las siguientes usan caché local.
+     - `getPokemons()`: Cachea listados paginados por 1 hora para el listado principal.
+     - `getPokemon()`: Cachea detalles individuales (nombre, stats, tipos, etc.) por 1 hora.
+   - **Ventaja**: Búsquedas parciales sin llamadas adicionales a API. Una sola petición masiva inicial, luego filtrado local instantáneo.
+   - **Refresh manual**: `getPokemonIndex(500, true)` fuerza descarga fresca si es necesario.
 
 ### 2. **Búsqueda Inteligente de Pokémon**
-   - **Coincidencia exacta**: Primero intenta encontrar el Pokémon exacto por nombre o ID
-   - **Búsqueda parcial**: Si no hay coincidencia exacta, realiza búsqueda por coincidencia parcial
-   - **Validación de entrada**: Requiere mínimo 2 caracteres, máximo 50
-   - **Mensajes personalizados**: Errores en español con mensajes claros
+   - **Coincidencia exacta**: Primero intenta encontrar el Pokémon exacto por nombre o ID (vía `getPokemon()`).
+   - **Búsqueda parcial**: Si no hay coincidencia exacta, busca en el índice cacheado (primeros 500 pokémon).
+   - **Filtrado local**: Realiza la búsqueda en memoria sin nuevas llamadas a API (muy rápido).
+   - **Límites controlados**: 
+     - `$limit = 20` → resultados a devolver.
+     - `$searchLimit = 500` → rango de pokémon indexados (configurable).
+   - **Validación de entrada**: Requiere mínimo 2 caracteres, máximo 50.
+   - **Mensajes personalizados**: Errores en español con contexto claro.
 
 ### 3. **Manejo de Errores**
    - Excepciones personalizadas para casos específicos (implementado uno a modo de ejemplo, la idea es implementarlo con los distintos tipos de errores, en especial los más comunes, como 401, 500, etc.)

@@ -23,11 +23,53 @@ class PokemonService
     }
 
     /**
-     * Obtiene una lista de Pokémon con paginación.
-     * @param mixed $limit
-     * @param mixed $offset
+     * Devuelve un índice cacheado (name, url, id) de los primeros N Pokémon.
+     * Este índice se usa para búsquedas parciales rápidas sin pedir todos los detalles.
+     * @param int $searchLimit Número máximo de pokémon a indexar (default 500)
+     * @param bool $forceRefresh Fuerza recarga del caché
+     * @return array
      */
-    public function getPokemons($offset = 0, $limit = 20)
+    public function getPokemonIndex($searchLimit = 500, $forceRefresh = false)
+    {
+        $cacheKey = "pokemon_index_{$searchLimit}";
+
+        if ($forceRefresh) {
+            Cache::forget($cacheKey);
+        }
+
+        return Cache::remember($cacheKey, 86400, function () use ($searchLimit) {
+            try {
+                $pokemons = $this->getPokemons($searchLimit, 0);
+                if (empty($pokemons)) {
+                    throw new NotFoundException('No pokemons available from API');
+                }
+
+                $index = array_map(function ($p) {
+                    return [
+                        'id' => $p['id'],
+                        'name' => $p['name'],
+                        'url' => $p['url']
+                    ];
+                }, $pokemons);
+
+                return $index;
+
+            } catch (NotFoundException $e) {
+                Log::warning('Failed building pokemon index', ['message' => $e->getMessage()]);
+                return [];
+            } catch (\Exception $e) {
+                Log::error('Unexpected error building pokemon index', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+                return [];
+            }
+        });
+    }
+
+    /**
+     * Obtiene una lista de Pokémon con paginación.
+     * @param int $limit  Número de resultados a devolver
+     * @param int $offset Desplazamiento para paginación
+     */
+    public function getPokemons($limit = 20, $offset = 0)
     {
         return Cache::remember("pokemon_list_{$offset}_{$limit}", 3600, function () use ($limit, $offset) {
             try {
@@ -142,11 +184,12 @@ class PokemonService
      * @param mixed $limit
      * @return array
      */
-    public function searchByPartialName($query, $limit = 151)
+    public function searchByPartialName($query, $limit = 20, $searchLimit = 500)
     {
         try {
 
-            $allPokemon = $this->getPokemons(0, $limit);
+            // Obtener índice cacheado de los primeros $searchLimit pokémon y filtrar localmente.
+            $allPokemon = $this->getPokemonIndex($searchLimit);
             if (empty($allPokemon)) {
                 throw new NotFoundException('No pokemons available from API');
             }
@@ -157,14 +200,16 @@ class PokemonService
                 return strpos(strtolower($pokemon['name']), $query) !== false;
             });
 
+            $sliced = array_slice($filtered, 0, $limit);
+
             $results = array_map(function($pokemon) {
-                $id = $this->extractIdFromUrl($pokemon['url']);
+                $id = $pokemon['id'];
                 return [
                     'id' => $id,
                     'name' => $pokemon['name'],
                     'image' => "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{$id}.png",
                 ];
-            }, \array_slice($filtered, 0, $limit));
+            }, $sliced);
 
             return array_values($results);
 
