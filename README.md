@@ -1,59 +1,200 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📱 Pokedex API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Una aplicación web interactiva para explorar Pokémon, construida con **Laravel 12** y el **PokeAPI**. Permite consultar información detallada de Pokémon.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Instalación y Ejecución
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Requisitos Previos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **PHP**: ^8.2
+- **Composer**: v2.0 o superior
+- **Node.js**: v18 o superior (para npm)
+- **Laravel Sail** (recomendado): Entorno Docker predeterminado
 
-## Learning Laravel
+### Pasos de Instalación
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+1. **Clonar el repositorio**
+   ```bash
+   git clone https://github.com/agusvlopez/pokedex-api.git
+   cd pokedex-api
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Instalar dependencias de PHP**
+   ```bash
+   composer install
+   ```
 
-## Laravel Sponsors
+3. **Configurar variables de entorno**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. **Instalar dependencias de Node.js**
+   ```bash
+   npm install
+   ```
 
-### Premium Partners
+### Ejecución
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+En una terminal:
+```bash
+php artisan serve
+```
 
-## Contributing
+En otra terminal:
+```bash
+npm run dev
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+La aplicación estará disponible en `http://localhost:8000`
+---
 
-## Code of Conduct
+## 📁 Organización del Código
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Estructura del Proyecto
 
-## Security Vulnerabilities
+```
+app/
+├── Http/
+│   └── Controllers/
+│       └── PokemonController.php      # Controlador principal
+├── Services/
+│   └── PokemonService.php             # Lógica de negocio
+└── Exceptions/
+    └── NotFoundException.php          # Excepción personalizada
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+routes/
+├── web.php                            # Rutas HTTP
 
-## License
+resources/
+├── views/
+│   ├── pokemons/
+│   │   ├── index.blade.php           # Lista de Pokémon
+│   │   ├── show.blade.php            # Detalle de Pokémon
+│   │   └── search.blade.php          # Resultados de búsqueda
+│   ├── layouts/
+│   │ └── app.blade.php               # Layout principal
+│   └── components/                   # Componentes reutilizables
+│       └── alerts.blade.php          # alertas personalizadas 
+└── css/
+    └── app.css                       # Estilos con Tailwind CSS
+    
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Patrones de Diseño Utilizados
+
+1. **Service Layer Pattern**: La clase `PokemonService` encapsula toda la lógica de negocio relacionada con Pokémon, separando esto del controlador.
+
+2. **Dependency Injection**: El `PokemonController` inyecta el `PokemonService` en el constructor para facilitar testing y desacoplamiento.
+
+3. **Repository Pattern (implícito)**: El servicio actúa como una capa de abstracción entre la API externa y los controladores.
+
+4. **Exception Handling**: Uso de excepciones personalizadas (`NotFoundException`) para errores específicos del dominio.
+
+---
+
+## ⚡ Funcionalidad Adicional Implementada
+
+### 1. **Caché Inteligente (Cache Layer)**
+   - **Implementación**: Sistema de caché con expiración de 1 hora
+   - **Ubicaciones**: 
+     - `getPokemons()`: Cachea listados paginados (esto, a su vez, utilizado en la búsqueda)
+     - `getPokemon()`: Cachea detalles individuales
+   - **Beneficio**: Reduce significativamente llamadas a la API externa, mejora velocidad de respuesta
+
+### 2. **Búsqueda Inteligente de Pokémon**
+   - **Coincidencia exacta**: Primero intenta encontrar el Pokémon exacto por nombre o ID
+   - **Búsqueda parcial**: Si no hay coincidencia exacta, realiza búsqueda por coincidencia parcial
+   - **Validación de entrada**: Requiere mínimo 2 caracteres, máximo 50
+   - **Mensajes personalizados**: Errores en español con mensajes claros
+
+### 3. **Manejo de Errores**
+   - Excepciones personalizadas para casos específicos (implementado uno a modo de ejemplo, la idea es implementarlo con los distintos tipos de errores, en especial los más comunes, como 401, 500, etc.)
+   - Logging detallado de errores en `storage/logs/`
+   - Respuestas HTTP apropiadas (404 cuando no se encuentra Pokémon)
+   - Fallback graceful: Retorna lista vacía si hay error en lugar de fallar
+
+### 4. **Optimización de Imágenes**
+   - Utiliza sprites de alta definición desde GitHub (PokeAPI sprites)
+   - Dos versiones de imagen: `image` y `image_hd` para flexibilidad
+   - Fallback automático si no hay imagen oficial
+
+---
+
+## 🔧 Decisiones Técnicas
+
+### 1. **Sistema de Caché (Cache Facades)**
+   **Por qué**:
+   - Evita exceder límites de rate limiting de PokeAPI
+   - Mejora significativamente el tiempo de respuesta
+
+### 2. **MVC + Service Layer**
+   **Por qué**:
+   - Separa la lógica de negocio del controlador (manejandola en el servicio)
+   - Facilita testing unitario
+   - Código más mantenible y escalable
+   - Permite reutilizar servicios en múltiples controladores
+
+### 3. **Tailwind CSS + Vite**
+   **Por qué**:
+   - Tailwind: rápido de desarrollar
+   - Vite: Bundler moderno y rápido. Ideal en proyectos pequeños como este.
+
+### 4. **Validación**
+
+**Por qué**:
+- Valida que `query` cumpla los requisitos antes de ejecutar la lógica.
+- Mejora la estabilidad y seguridad: evita excepciones y cualquier dato que podrían romper el flujo.
+- Mejora la experiencia del frontend: devuelve mensajes legibles para el usuario.
+
+Nota: en proyectos grandes es preferible usar Form Requests (por ejemplo en `app/Http/Requests`) en lugar de validar directamente en el controlador. Acá se utiliza `$request->validate()` por simplicidad.
+
+Ejemplo:
+```php
+public function search(Request $request)
+{
+   $data = $request->validate([
+      'query' => 'required|string|min:2|max:50',
+   ], [
+      'query.required' => 'Por favor ingresá un nombre',
+      'query.min' => 'Ingresá al menos 2 caracteres',
+   ]);
+}
+```
+
+---
+
+## 📊 Flujo de Datos
+
+```
+Usuario → Navegador → Laravel Router → PokemonController 
+         ↓
+    Valida Entrada
+         ↓
+    PokemonService
+         ↓
+    Verifica Caché
+         ├─ Caché válida → Retorna datos
+         └─ Caché expirada → Consulta PokeAPI → Cachea resultado
+         ↓
+    View (Blade Template)
+         ↓
+    HTML + CSS/JS → Usuario
+```
+
+---
+
+## 🔗 Recursos
+
+- [Laravel](https://laravel.com/docs/12.x)
+- [PokeAPI](https://pokeapi.co/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Vite](https://vitejs.dev/)
+
+---
+
+**Versión**: 1.0.0  
+**Última actualización**: Enero 2026
