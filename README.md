@@ -193,6 +193,17 @@ Usuario → Navegador → Laravel Router → PokemonController
 
 ---
 
+## 🚀 Mejoras a Realizar
+
+- **Form Requests**: Migrar validación del controlador a clases `SearchPokemonRequest`.
+- **Paginación**: Implementar paginación.
+- **Tests unitarios**: Implementar tests para caché, búsqueda y manejo de errores.
+- **Páginas de Error**: Personalizar vistas 404 y 500 con UI consistente.
+- **Filtros avanzados**: Por tipo, generación, rango de stats.
+- **Mejora en UX/UI**: Manejo de Loaders para una mejor experiencia de usuario.
+- **Implementar BBDD**: Implementar la conexión con una base de datos para no depender del cache local. 
+---
+
 ## 🔗 Recursos
 
 - [Laravel](https://laravel.com/docs/12.x)
